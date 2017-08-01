@@ -8,6 +8,9 @@ from Pymacs import lisp
 from rope.base import utils
 
 
+interactions = {}
+
+
 class LispUtils(ropemode.environment.Environment):
 
     def ask(self, prompt, default=None, starting=None):
@@ -335,10 +338,11 @@ the rope-marker-ring")
     def _set_interaction(self, callback, prefix):
         if hasattr(callback, 'im_func'):
             callback = callback.im_func
-        if prefix:
-            callback.interaction = 'P'
-        else:
-            callback.interaction = ''
+        interaction = 'P' if prefix else ''
+        try:
+            callback.interaction = interaction
+        except AttributeError:
+            interactions[callback] = interaction
 
     def add_hook(self, name, callback, hook):
         mapping = {'before_save': 'before-save-hook',
